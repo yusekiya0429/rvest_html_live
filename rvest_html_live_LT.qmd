@@ -19,17 +19,7 @@ execute:
 ## load libraries 
 need_packages <- c(
     "rvest",
-    "chromote",
-    "dplyr",
-    "tidyr",
-    "readxl",
-    "ggplot2",
-    "DT",
-    "scales",
-    "stringi",
-    "showtext"
-    # ,
-    # "pdftools"
+    "chromote"
 )
 
 to_be_installed <- setdiff(need_packages, installed.packages())
@@ -86,6 +76,7 @@ Webスクレイピング（クローリング）の注意事項
 url <- "https://maps.gsi.go.jp/"
 html <- read_html_live(url)
 html$view()
+
 ```
 
 ```{r}
