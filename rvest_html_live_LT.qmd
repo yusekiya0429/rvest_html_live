@@ -1,0 +1,100 @@
+---
+title: "rvesのhtml_liveでインタラクティブにクローリングする方法"
+author: "`@kotatyamtema`"
+date: "`r format(Sys.time(), '%Y/%m/%d')`"
+lang: "ja"
+format:
+  html:
+    embed-resources: true
+
+execute: 
+  echo: true
+  eval: true
+  collapse: true
+  massage: false
+  warning: false
+---
+
+```{r setup, include=FALSE}
+## load libraries 
+need_packages <- c(
+    "rvest",
+    "chromote",
+    "dplyr",
+    "tidyr",
+    "readxl",
+    "ggplot2",
+    "DT",
+    "scales",
+    "stringi",
+    "showtext"
+    # ,
+    # "pdftools"
+)
+
+to_be_installed <- setdiff(need_packages, installed.packages())
+if (length(to_be_installed) > 0) {
+    install.packages(to_be_installed, repos = "https://cloud.r-project.org/", dependencies = TRUE)
+}
+
+for (p in need_packages) {
+    library(p, character.only = TRUE)
+}
+
+# 日本語設定
+showtext_auto()
+
+```
+
+## rvestとは   
+
+![](./rvest_web.png) 
+
+tydyverseにあるWebスクレイピング用のパッケージ。XPATH対応でアドホックなスクレイピングにはとても便利。    
+[Easily Harvest (Scrape) Web Pages • rvest](https://rvest.tidyverse.org/)    
+※PythonのBeautifulSoup のような高度な管理機能はない    
+
+Webスクレイピング（クローリング）の注意事項     
+- 相手のサーバーに負荷をかけるので基本的に歓迎されない    
+- 相手の負荷を考えて連続してスクレイピングしない    
+- 定期実行するとgoogleから高確率でbot判定されてBANされる    
+- スクレイピングする前にAPIを公開していないか確認すること     
+
+→基本的にお行儀の悪い行為で歓迎されないと認識したほうが良い     
+
+## ちょっと複雑なスクレイピング    
+静的サイトのスクレイピングはrvest単体で十分だったが、動的サイトは他のパッケージが必要     
+`html_live`に対応した関数が追加されてrvest単体で可能に     
+
+## html_liveの基本的な機能    
+- read_html_live: 
+- view: 実行内容をブラウザに表示させる  
+- type: 指定したエレメントに文字を入力する    
+- press: 指定したエレメントを押す（`Enter`を押して進める場合など）    
+- click: 検索ボタンのようなエレメントをクリックする     
+- html_elements: 指定したエレメントを取得する     
+
+### 注意点
+対象のエレメントの指定はCSS selector
+
+## 国土地理院のサイトを使ったデモ   
+- 国土地理院のGSI mapに検索ワードをいれてズームし、情報を取得する    
+  - 必要なパッケージは`rvest` と `chromote` 
+  - デフォルトで使うブラウザはChromeなのでなければインストールが必要   
+```{r}
+# 対象のURLをhtml_liveで読み込み表示させる
+url <- "https://maps.gsi.go.jp/"
+html <- read_html_live(url)
+html$view()
+```
+
+```{r}
+html$type("#query", "富士山") 
+html$press("#query", key_code = "Enter")
+html$view()
+```
+
+```{r}
+html$click("body > div.gsi_dialog.ui-draggable.ui-resizable > div.gsi_dialog_content > div > div.searchresultdialog_ul_frame > ul > li:nth-child(1)")
+html$view()
+```
