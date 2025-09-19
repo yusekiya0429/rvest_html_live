@@ -89,3 +89,7 @@ html$view()
 html$click("body > div.gsi_dialog.ui-draggable.ui-resizable > div.gsi_dialog_content > div > div.searchresultdialog_ul_frame > ul > li:nth-child(1)")
 html$view()
 ```
+
+```{r}
+html$click("body > div.gsi_dialog.ui-draggable.ui-resizable > div.gsi_dialog_content > div > div.searchresultdialog_ul_frame > ul > li:nth-child(2)")
+```
